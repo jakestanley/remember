@@ -20,7 +20,17 @@ const (
     SCREEN_WIDTH = 640;
     SCREEN_HEIGHT = 400;
     SCALE = 1;
+
+    // time
+    SECOND = 1000000000;
+    HALF_SECOND = 500000000;
+    THIRTIETH_SECOND = 33333333;
+
 )
+
+// render translation
+var renderOffsetX float64 = 0.0; 
+var renderOffsetY float64 = 0.0;
 
 // loop counter
 var count int = 0;
@@ -70,10 +80,12 @@ func loadImage(path string, filter ebiten.Filter) (*ebiten.Image, error) {
 func update() error {
     tick();
 
+    // TODO flexible camera
+
     // calculate delta
     now := time.Now();
     timediff := now.Sub(prevTime);
-    delta = (float64(timediff.Nanoseconds()) / 1000000000) * 60;
+    delta = (float64(timediff.Nanoseconds()) / SECOND) * 60;
     prevTime = now;
 
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyQ))){
@@ -118,7 +130,12 @@ func draw(screen *ebiten.Image) {
         return;
     }
     
-    screen.DrawImage(imgx, nil);
+    options := &ebiten.DrawImageOptions{}
+    options.GeoM.Translate(renderOffsetX, renderOffsetY);
+    renderOffsetX += delta;
+    renderOffsetY += delta;
+
+    screen.DrawImage(imgx, options);
 
     drawMap();
     drawEntities();
