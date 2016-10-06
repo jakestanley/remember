@@ -18,9 +18,11 @@ import (
 const (
     // game constants
     GAME_TITLE = "Remember When We Were Able To Go Outside?";
-    SCREEN_WIDTH = 640;
-    SCREEN_HEIGHT = 400;
-    SCALE = 1;
+    SCREEN_WIDTH = 288;
+    SCREEN_HEIGHT = 216;
+    SCREEN_MARGIN = 10;
+    SCALE = 2;
+    FONT_SCALE = 1;
 
     // time
     SECOND = 1000000000;
@@ -54,7 +56,8 @@ func initialise() {
     prevTime = time.Now();
     prevSec = time.Now();
     delta = 1;
-    // ebitenImage, imageImage, err := ebitenutil.NewImageFromFile("_resoures/64_px_square.png", ebiten.FilterNearest);
+    // ebitenImage, imageImage, err := ebitenutil.NewImageFromFile("_resoures/64_px_square.png", 
+    // ebiten.FilterNearest);
 
 }
 
@@ -125,10 +128,10 @@ func draw(screen *ebiten.Image) {
     drawUi();
     drawModals(); // dim if necessary
     
-    fpsStrConv := strconv.FormatFloat(ebiten.CurrentFPS(), 'f', -1, 64);
+    fpsStrConv := strconv.FormatFloat(ebiten.CurrentFPS(), 'f', 2, 64);
     fpsString := "fps " + fpsStrConv;
 
-    deltaStrConv := strconv.FormatFloat(delta, 'f', -1, 32);
+    deltaStrConv := strconv.FormatFloat(delta, 'f', 2, 32);
     deltaString := "delta " + deltaStrConv;
 
     // err := screen.DrawImage(testpng, nil);
@@ -137,11 +140,12 @@ func draw(screen *ebiten.Image) {
     // }
 
     // // figured out text size and position and draw it on the screen
-    width := common.ArcadeFont.TextWidth(deltaString) * SCALE;
-    x := (SCREEN_WIDTH - width) / 2;
-    common.ArcadeFont.DrawText(screen, deltaString, x, 20, SCALE, color.White);
+    width := common.ArcadeFont.TextWidth(deltaString);
+    x := (SCREEN_WIDTH - width) / 2; // center
+    y := SCREEN_HEIGHT - common.ArcadeFont.TextHeight("H") - SCREEN_MARGIN;
 
-    common.ArcadeFont.DrawText(screen, fpsString, 20, 20, SCALE, color.White);
+    common.ArcadeFont.DrawText(screen, deltaString, x, y, FONT_SCALE, color.White);
+    common.ArcadeFont.DrawText(screen, fpsString, SCREEN_MARGIN, y, FONT_SCALE, color.White);
 
 }
 
