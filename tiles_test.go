@@ -41,8 +41,18 @@ func TestNewTile(t *testing.T) {
         expectedMaxX := tests[i].expectedMaxX;
         expectedMaxY := tests[i].expectedMaxY;
 
+        fail := false;
+
         tile := NewTileCustom(inputX, inputY, DEFAULT_TILE_SIZE);
-        fail := (tile.Min.X != expectedMinX) || (tile.Min.Y != expectedMinY) || (tile.Max.X != expectedMaxX) || (tile.Max.Y != expectedMaxY);
+        if(tile.Min.X != expectedMinX){
+            fail = true;
+        } else if (tile.Min.Y != expectedMinY){
+            fail = true;
+        } else if (tile.Max.X != expectedMaxX){
+            fail = true;
+        } else if (tile.Max.Y != expectedMaxY){
+            fail = true;
+        }
 
         if(fail == true){
             failures = failures + 1;
