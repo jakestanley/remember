@@ -5,7 +5,7 @@ import (
         "errors"
         // "log"
         // "image"
-        "fmt"
+        // "fmt"
         "time"
         "strconv"
         "image/color"
@@ -28,11 +28,13 @@ const (
     SECOND = 1000000000;
     HALF_SECOND = 500000000;
 
+    // world
+    MOVE_SPEED = 2;
+
 )
 
 // render translation
-var renderOffsetX float64 = 0.0; 
-var renderOffsetY float64 = 0.0;
+var camera *Camera;
 
 // loop counter
 var count int = 0;
@@ -48,10 +50,8 @@ var deltas []float64;
 var keyDownW bool = false;
 var keyDownE bool = false;
 
-// images/resources
-var testpng ebiten.Image;
-
 func initialise() {
+    camera = NewCamera();
     initTiles();
     prevTime = time.Now();
     prevSec = time.Now();
@@ -62,9 +62,13 @@ func initialise() {
 }
 
 func update() error {
-    tick();
-
+    // FIXME delta on focus loss
     // TODO flexible camera
+
+    // quit
+    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyQ))){
+        return errors.New("USER_QUIT");
+    }
 
     // calculate delta
     now := time.Now();
@@ -72,20 +76,7 @@ func update() error {
     delta = (float64(timediff.Nanoseconds()) / SECOND) * 60;
     prevTime = now;
 
-    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyQ))){
-        return errors.New("USER_QUIT");
-    }
-
-    // handle W key
-    if (ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyW))){
-        if(!keyDownW){
-            keyDownW = true;
-            // d = d.AddDays(1); // fire action
-            // incrementHour(1);
-        }
-    } else {
-        keyDownW = false;
-    }
+    input();
 
     // handle E key
     if (ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyE))){
@@ -100,52 +91,43 @@ func update() error {
     return nil;
 }
 
-// increment tick and update delta time
-func tick() {
+func input() {
+
+    ms := MOVE_SPEED * delta;
+
+    // move up // TODO move the player character and make the camera move accordingly
+    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyW))){
+        camera.Move(0.0, ms);
+    }
+
+    // move down
+    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyS))){
+        camera.Move(0.0, 0.0 -ms);
+    }
+
+    // move left
+    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyA))){
+        camera.Move(ms, 0.0);
+    }
+
+    // move right
+    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyD))){
+        camera.Move(0.0 - ms, 0.0);
+    }
 
 }
 
 func draw(screen *ebiten.Image) {
-
-    // trying to load and use the image pointer in the same block
-    imgx, err := loadImage("_resources/tiles.png");
-    if(err != nil){
-        fmt.Println("failed to load image");
-        return;
-    }
     
-    options := &ebiten.DrawImageOptions{}
-    options.ImageParts = tileArranger;
-    options.GeoM.Translate(renderOffsetX, renderOffsetY);
+    drawTiles(screen, camera); // TODO merge into drawMap?
 
     // renderOffsetX += delta;
     // renderOffsetY += delta;
 
-    screen.DrawImage(imgx, options);
-
     drawMap();
     drawEntities();
-    drawUi();
+    drawUi(screen);
     drawModals(); // dim if necessary
-    
-    fpsStrConv := strconv.FormatFloat(ebiten.CurrentFPS(), 'f', 2, 64);
-    fpsString := "fps " + fpsStrConv;
-
-    deltaStrConv := strconv.FormatFloat(delta, 'f', 2, 32);
-    deltaString := "delta " + deltaStrConv;
-
-    // err := screen.DrawImage(testpng, nil);
-    // if(err != nil){
-    //     log.Fatal();
-    // }
-
-    // // figured out text size and position and draw it on the screen
-    width := common.ArcadeFont.TextWidth(deltaString);
-    x := (SCREEN_WIDTH - width) / 2; // center
-    y := SCREEN_HEIGHT - common.ArcadeFont.TextHeight("H") - SCREEN_MARGIN;
-
-    common.ArcadeFont.DrawText(screen, deltaString, x, y, FONT_SCALE, color.White);
-    common.ArcadeFont.DrawText(screen, fpsString, SCREEN_MARGIN, y, FONT_SCALE, color.White);
 
 }
 
@@ -157,7 +139,21 @@ func drawEntities() {
 
 }
 
-func drawUi() {
+func drawUi(screen *ebiten.Image) {
+    
+    fpsStrConv := strconv.FormatFloat(ebiten.CurrentFPS(), 'f', 2, 64);
+    fpsString := "fps " + fpsStrConv;
+
+    deltaStrConv := strconv.FormatFloat(delta, 'f', 2, 32);
+    deltaString := "delta " + deltaStrConv;
+
+    // // figured out text size and position and draw it on the screen
+    width := common.ArcadeFont.TextWidth(deltaString);
+    x := (SCREEN_WIDTH - width) / 2; // center
+    y := SCREEN_HEIGHT - common.ArcadeFont.TextHeight("H") - SCREEN_MARGIN;
+
+    common.ArcadeFont.DrawText(screen, deltaString, x, y, FONT_SCALE, color.White);
+    common.ArcadeFont.DrawText(screen, fpsString, SCREEN_MARGIN, y, FONT_SCALE, color.White);
 
 }
 

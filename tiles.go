@@ -97,7 +97,7 @@ func (ta *TileArranger) Dst(i int) (x0, y0, x1, y1 int) {
 
 // TODO add a user defined string seed and default to time.Now().UnixNano() if empty or nil
 func (ta *TileArranger) Randomize(widthInTiles, heightInTiles int) {
-    rand.Seed(time.Now().UnixNano()); // Try changing this number!
+    rand.Seed(time.Now().UnixNano()); // doesn't work with the same number FIXME 
     for x := 0; x < widthInTiles; x++ {
         for y := 0; y < heightInTiles; y++ {
             adjX := x * DEFAULT_TILE_SIZE;
@@ -126,10 +126,22 @@ func initTiles() {
 
     // create tile arranger
     tileArranger = NewTileArranger(ts);
-    tileArranger.Randomize(8, 8); // TODO actually pick random tiles
+    tileArranger.Randomize(8, 8);
 
     // if(err != nil){
     //     fmt.Println("error occurred adding to the tile arranger");
     // }
 
+}
+
+// TODO pass camera object and use it for translations
+func drawTiles(screen *ebiten.Image, camera *Camera) { // TODO handle multiple tilesheets loaded into memory?
+    imgx := ts.sheet;
+    options := &ebiten.DrawImageOptions{};
+    options.ImageParts = tileArranger;
+
+    // apply view transformation
+    camera.ApplyTransformation(&options.GeoM);
+
+    screen.DrawImage(imgx, options);
 }
