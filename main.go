@@ -29,7 +29,6 @@ const (
     HALF_SECOND = 500000000;
 
     // world
-    MOVE_SPEED = 2;
 
 )
 
@@ -42,7 +41,6 @@ var count int = 0;
 // date/time
 var day int = 1;
 var prevTime time.Time;
-var prevSec time.Time;
 var delta float64; // time in nanos
 var deltas []float64;
 
@@ -50,12 +48,19 @@ var deltas []float64;
 var keyDownW bool = false;
 var keyDownE bool = false;
 
+// world
+var player *Player;
+
 func initialise() {
+
+    // initialise arrays, etc
+    initDirectionVectors();
+
     camera = NewCamera();
     initTiles();
     prevTime = time.Now();
-    prevSec = time.Now();
     delta = 1;
+    player = NewPlayer();
     // ebitenImage, imageImage, err := ebitenutil.NewImageFromFile("_resoures/64_px_square.png", 
     // ebiten.FilterNearest);
 
@@ -88,32 +93,53 @@ func update() error {
         keyDownE = false;
     }
 
+    // TODO update camera
+
     return nil;
 }
 
 func input() {
 
-    ms := MOVE_SPEED * delta;
-
     // move up // TODO move the player character and make the camera move accordingly
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyW))){
-        camera.Move(0.0, ms);
+        player.Move(W_MOVE_UP);
     }
 
     // move down
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyS))){
-        camera.Move(0.0, 0.0 -ms);
+        player.Move(W_MOVE_DOWN);
     }
 
     // move left
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyA))){
-        camera.Move(ms, 0.0);
+        player.Move(W_MOVE_LEFT);
     }
 
     // move right
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyD))){
-        camera.Move(0.0 - ms, 0.0);
+        player.Move(W_MOVE_RIGHT);
     }
+
+    // camera up // TODO move the player character and make the camera move accordingly
+    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyUp))){
+        camera.Move(CAM_PAN_UP);
+    }
+
+    // camera down
+    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyDown))){
+        camera.Move(CAM_PAN_UP); // TODO change this to 1,-1 bounded vector, make GetCamSpeed()
+    }
+
+    // camera left
+    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyLeft))){
+        camera.Move(CAM_PAN_LEFT);
+    }
+
+    // camera right
+    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyRight))){
+        camera.Move(CAM_PAN_RIGHT);
+    }
+    
 
 }
 
@@ -125,7 +151,7 @@ func draw(screen *ebiten.Image) {
     // renderOffsetY += delta;
 
     drawMap();
-    drawEntities();
+    drawEntities(screen);
     drawUi(screen);
     drawModals(); // dim if necessary
 
@@ -135,7 +161,22 @@ func drawMap() {
 
 }
 
-func drawEntities() {
+func drawEntities(screen *ebiten.Image) {
+
+    // screen *ebiten.Image, camera *Camera
+
+    imgx := player.sprite;
+    options := &ebiten.DrawImageOptions{};
+    options.GeoM.Translate(player.x, player.y);
+    // options.ImageParts = tileArranger;
+
+    // apply view transformation
+    // camera.ApplyTransformation(&options.GeoM);
+
+    // apply view transformation
+    camera.ApplyTransformation(&options.GeoM);
+
+    screen.DrawImage(imgx, options);
 
 }
 
