@@ -93,8 +93,6 @@ func update() error {
         keyDownE = false;
     }
 
-    // TODO update camera
-
     return nil;
 }
 
@@ -103,42 +101,46 @@ func input() {
     // move up // TODO move the player character and make the camera move accordingly
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyW))){
         player.Move(W_MOVE_UP);
+        camera.Move(CAM_PAN_UP);
     }
 
     // move down
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyS))){
         player.Move(W_MOVE_DOWN);
+        camera.Move(CAM_PAN_DOWN);
     }
 
     // move left
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyA))){
         player.Move(W_MOVE_LEFT);
+        camera.Move(CAM_PAN_LEFT);
     }
 
     // move right
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyD))){
         player.Move(W_MOVE_RIGHT);
-    }
-
-    // camera up // TODO move the player character and make the camera move accordingly
-    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyUp))){
-        camera.Move(CAM_PAN_UP);
-    }
-
-    // camera down
-    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyDown))){
-        camera.Move(CAM_PAN_UP); // TODO change this to 1,-1 bounded vector, make GetCamSpeed()
-    }
-
-    // camera left
-    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyLeft))){
-        camera.Move(CAM_PAN_LEFT);
-    }
-
-    // camera right
-    if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyRight))){
         camera.Move(CAM_PAN_RIGHT);
     }
+
+    // camera up
+    // if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyUp))){
+        
+    // }
+
+    // // camera down
+    // if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyDown))){
+        
+    // }
+
+    // // camera left
+    // if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyLeft))){
+        
+    // }
+
+    // // camera right
+    // if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyRight))){
+        
+    // }
     
 
 }
@@ -165,7 +167,7 @@ func drawEntities(screen *ebiten.Image) {
 
     // screen *ebiten.Image, camera *Camera
 
-    imgx := player.sprite;
+    imgx := player.sprite; // TODO for each, and have many sheets
     options := &ebiten.DrawImageOptions{};
     options.GeoM.Translate(player.x, player.y);
     // options.ImageParts = tileArranger;
@@ -188,18 +190,29 @@ func drawUi(screen *ebiten.Image) {
     deltaStrConv := strconv.FormatFloat(delta, 'f', 2, 32);
     deltaString := "delta " + deltaStrConv;
 
+    // get text height
+    height := common.ArcadeFont.TextHeight("H");
+
     // // figured out text size and position and draw it on the screen
     width := common.ArcadeFont.TextWidth(deltaString);
     x := (SCREEN_WIDTH - width) / 2; // center
-    y := SCREEN_HEIGHT - common.ArcadeFont.TextHeight("H") - SCREEN_MARGIN;
+    y := SCREEN_HEIGHT - height - SCREEN_MARGIN;
+
+    // player position debug
+    posStr := "Player position: " + strconv.FormatFloat(player.x, 'f', 1, 64);
+    posStr += ", " + strconv.FormatFloat(player.y, 'f', 1, 64);
 
     common.ArcadeFont.DrawText(screen, deltaString, x, y, FONT_SCALE, color.White);
     common.ArcadeFont.DrawText(screen, fpsString, SCREEN_MARGIN, y, FONT_SCALE, color.White);
 
+    posStrY := y - height - SCREEN_MARGIN;
+    common.ArcadeFont.DrawText(screen, posStr, SCREEN_MARGIN, posStrY, FONT_SCALE, color.White);
+
 }
 
 func drawModals() {
-
+    // TODO window tiles. doesn't need to be fancy
+    // for production build, we can merge everything into one big sprite sheet. use coordinates
 }
 
 func loop(screen *ebiten.Image) error {

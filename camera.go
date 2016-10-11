@@ -3,7 +3,7 @@ package main;
 import "image"
 import "github.com/hajimehoshi/ebiten"
 
-const PAN_SPEED = 2;
+const PAN_SPEED = 1.4; // TODO consider using the same constant as the player?
 
 type Camera struct {
     pX float64;

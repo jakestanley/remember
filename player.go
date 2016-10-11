@@ -5,7 +5,7 @@ import "image"
 import "errors"
 import "github.com/hajimehoshi/ebiten"
 
-const PLAYER_SPEED = 1.8;
+const PLAYER_SPEED = 1.4;
 const PLAYER_WIDTH = 16;
 
 type Player struct {
@@ -24,13 +24,15 @@ func NewPlayer() *Player { // TODO character sheet loader
 
     rect := image.Rect(0, 0, PLAYER_WIDTH - 1, PLAYER_WIDTH - 1);
 
-    p := Player{0,0,sprite,rect};
+    initX := float64((SCREEN_WIDTH - PLAYER_WIDTH) / 2) - PLAYER_WIDTH;
+    initY := float64((SCREEN_HEIGHT - PLAYER_WIDTH) / 2) - PLAYER_WIDTH;
+
+    p := Player{initX, initY, sprite, rect};
 
     return &p;
 }
 
-// TODO make this take a direction // TODO test
-func (p *Player) Move(dv image.Point) error { // TODO bound 1,-1 or make a DirectionVector object
+func (p *Player) Move(dv image.Point) error {
 
     x := dv.X;
     y := dv.Y;
