@@ -11,7 +11,7 @@ type Camera struct {
 }
 
 func NewCamera() *Camera {
-    c := Camera{15.0,15.0};
+    c := Camera{0,0}; // TODO remove magic values
     return &c;
 }
 

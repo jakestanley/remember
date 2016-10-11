@@ -24,8 +24,8 @@ func NewPlayer() *Player { // TODO character sheet loader
 
     rect := image.Rect(0, 0, PLAYER_WIDTH - 1, PLAYER_WIDTH - 1);
 
-    initX := float64((SCREEN_WIDTH - PLAYER_WIDTH) / 2) - PLAYER_WIDTH;
-    initY := float64((SCREEN_HEIGHT - PLAYER_WIDTH) / 2) - PLAYER_WIDTH;
+    initX := float64((SCREEN_WIDTH - PLAYER_WIDTH) / 2);
+    initY := float64((SCREEN_HEIGHT - PLAYER_WIDTH) / 2);
 
     p := Player{initX, initY, sprite, rect};
 
