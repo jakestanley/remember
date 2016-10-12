@@ -6,7 +6,6 @@ import (
         // "log"
         // "image"
         // "fmt"
-        "time"
         "strconv"
         "image/color"
         // "github.com/aodin/date"
@@ -35,18 +34,8 @@ const (
 // render translation
 var camera *Camera;
 
-// loop counter
-var count int = 0;
-
 // date/time
 var day int = 1;
-var prevTime time.Time;
-var delta float64; // time in nanos
-var deltas []float64;
-
-// prevents holding down keys
-var keyDownW bool = false;
-var keyDownE bool = false;
 
 // world
 var player *Player;
@@ -57,41 +46,27 @@ func initialise() {
     initDirectionVectors();
 
     camera = NewCamera();
+    // initialise delta
+    initDelta();
+
     initTiles();
-    prevTime = time.Now();
-    delta = 1;
     player = NewPlayer();
-    // ebitenImage, imageImage, err := ebitenutil.NewImageFromFile("_resoures/64_px_square.png", 
-    // ebiten.FilterNearest);
 
 }
 
 func update() error {
-    // FIXME delta on focus loss
-    // TODO flexible camera
+
+    // update delta
+    updateDelta();
 
     // quit
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyQ))){
         return errors.New("USER_QUIT");
     }
 
-    // calculate delta
-    now := time.Now();
-    timediff := now.Sub(prevTime);
-    delta = (float64(timediff.Nanoseconds()) / SECOND) * 60;
-    prevTime = now;
-
+    // do other input
     input();
 
-    // handle E key
-    if (ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyE))){
-        if(!keyDownE){
-            keyDownE = true;
-            // d = d.AddDays(30); // fire action
-        }
-    } else {
-        keyDownE = false;
-    }
 
     return nil;
 }
@@ -148,10 +123,6 @@ func input() {
 func draw(screen *ebiten.Image) {
     
     drawTiles(screen, camera); // TODO merge into drawMap?
-
-    // renderOffsetX += delta;
-    // renderOffsetY += delta;
-
     drawMap();
     drawEntities(screen);
     drawUi(screen);
