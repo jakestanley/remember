@@ -31,26 +31,28 @@ const (
 
 )
 
-// render translation
-var camera *Camera;
-
 // date/time
 var day int = 1;
 
 // world
+var camera *Camera;
 var player *Player;
+var pcVel  *Velocity;
 
 func initialise() {
 
     // initialise arrays, etc
     initDirectionVectors();
 
-    camera = NewCamera();
     // initialise delta
     initDelta();
 
     initTiles();
-    player = NewPlayer();
+    
+    // initialise player/camera stuff
+    pcVel    = NewVelocity(PLAYER_SPEED, PLAYER_SPEED_INC);
+    camera   = NewCameraV(pcVel);
+    player   = NewPlayer(pcVel);
 
 }
 
@@ -67,34 +69,46 @@ func update() error {
     // do other input
     input();
 
+    // update movement speeds, etc
+    pcVel.UpdateSpeed(delta);
 
     return nil;
 }
 
 func input() {
 
+    moving := false;
+
     // move up // TODO move the player character and make the camera move accordingly
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyW))){
         player.Move(W_MOVE_UP);
         camera.Move(CAM_PAN_UP);
+        moving = true;
     }
 
     // move down
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyS))){
         player.Move(W_MOVE_DOWN);
         camera.Move(CAM_PAN_DOWN);
+        moving = true;
     }
 
     // move left
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyA))){
         player.Move(W_MOVE_LEFT);
         camera.Move(CAM_PAN_LEFT);
+        moving = true;
     }
 
     // move right
     if(ebiten.IsKeyPressed(ebiten.Key(ebiten.KeyD))){
         player.Move(W_MOVE_RIGHT);
         camera.Move(CAM_PAN_RIGHT);
+        moving = true;
+    }
+
+    if(moving){
+        pcVel.Accelerate();
     }
 
     // camera up
